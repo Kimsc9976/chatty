@@ -5,22 +5,13 @@ import jakarta.persistence.GenerationType;
 import lombok.*;
 
 
-@Entity
+/*@Entity*/
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+/*@AllArgsConstructor*/
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Chat {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String message;
-    private String sender;
-    private String receiver;
-    private String timestamp;
-
 
 
 }

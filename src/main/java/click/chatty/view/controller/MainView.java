@@ -10,7 +10,8 @@ public class MainView {
 
     @GetMapping("/")
     public String index() {
-        log.info("MainView.index() 불려옴 =============================== ");
+        log.info("MainView.index() 불려옴 =============================== {}", log.getName());
+        log.debug("오류 발생 시 디버그 로그 확인용 =============================== {}", log.getName());
         return "index";
     }
 
