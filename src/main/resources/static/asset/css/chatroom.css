@@ -1,0 +1,31 @@
+
+.card {
+    height: 500px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    overflow-y: scroll;
+}
+
+.chat-box-message {
+    margin-bottom: 30px;
+}
+
+.chat-box-input {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.chat-box-input label {
+    width: 100%;
+}
+

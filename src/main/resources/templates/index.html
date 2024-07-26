@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:replace="~{include/header :: header}"></div>
 <link rel="stylesheet" href="/asset/css/index.css">
 <body>
@@ -19,7 +20,7 @@
                                 <p class="room-id">1</p>
                                 <h4 class="room-name">Room Name</h4>
                                 <p class="room-status">현재/전체</p>
-                                <a href="#" class="btn btn-primary">Enter</a>
+                                <a sec:authorize="isAuthenticated()" href="/chat" class="btn btn-primary">Enter</a>
                             </li>
                         </ul>
                     </div>

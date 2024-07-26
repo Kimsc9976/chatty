@@ -17,12 +17,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public void join(UserDTO userDTO) {
-        User user = User.builder()
-                .username(userDTO.getUsername())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
-                .email(userDTO.getEmail())
-                .role(User.Role.ROLE_USER)
-                .build();
+        User user = User.fromDTO(userDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         log.info("Join user: {}", user);
         userRepository.save(user);
     }

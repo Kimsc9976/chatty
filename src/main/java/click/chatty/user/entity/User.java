@@ -1,7 +1,9 @@
 package click.chatty.user.entity;
 
+import click.chatty.user.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 
@@ -11,11 +13,12 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "user")
 public class User {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +48,22 @@ public class User {
         ROLE_USER,
         ROLE_ADMIN,
         ROLE_ANONYMOUS
+    }
+
+    public static User fromDTO(UserDTO userDTO) {
+        return User.builder()
+                .username(userDTO.getUsername())
+                .password(userDTO.getPassword())
+                .email(userDTO.getEmail())
+                .build();
+    }
+
+    public UserDTO toDTO() {
+        return UserDTO.builder()
+                .username(username)
+                .password(password)
+                .email(email)
+                .build();
     }
 
 }

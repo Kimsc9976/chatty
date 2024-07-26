@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:replace="~{include/header :: header}"></div>
+<link rel="stylesheet" href="/asset/css/chatroom.css">
+<body>
+
+
+<div class="container">
+    <div class="row d-flex justify-content-center align-content-center">
+        <div class="col-lg-8 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Room Name</h3>
+                    <a href="/" class="btn btn-danger">Exit</a>
+                </div>
+                <div class="card-body">
+                    <div class="chat-box">
+                        <div class="chat-box-content" id="chat-box-content">
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-box-message"> <!-- 반복 -->
+                                <div class="chat-box-message-content">
+                                    <div class="chat-box-message-text"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>name<</p>
+                                        <p>Hi, how are you?</p>
+                                    </div>
+                                    <div class="chat-box-message-time"><!-- TODO : JS 로 동적 구현할 자리 -->
+                                        <p>10:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-box-input">
+                <label for="message">
+                    <input id="message" type="text" class="form-control" placeholder="Type a message">
+                </label>
+                <button class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{include/footer :: footer}"></div>
+</body>
