@@ -7,12 +7,12 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">
-                        Join !
+                        Login !
                     </h4>
                 </div>
                 <div class="card-body">
                     <div class="login-form">
-                        <form id="loginForm" class="form-group">
+                        <form th:action="@{/login}" method="post" id="loginForm" class="form-group">
                             <div class="mb-3">
                                 <label for="username" class="form-label">아이디</label>
                                 <input type="text" id="username" class="form-control" name="username" required>
@@ -24,6 +24,9 @@
                             <div class="mb-3 d-flex justify-content-end align-content-center">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
+                            <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                                로그인 실패 (아이디 또는 비밀번호를 확인해주세요)
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -34,5 +37,4 @@
 
 
 <div th:replace="~{include/footer :: footer}"></div>
-<script type="module" src="/asset/js/login.js"></script>
 </body>

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+
 import java.util.List;
 
 @Entity
@@ -39,7 +40,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SocialUser> socialUsers;
 
-    // getters and setters
 
     public enum Role {
         ROLE_USER,

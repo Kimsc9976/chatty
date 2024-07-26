@@ -16,9 +16,11 @@ function join() {
         email: $("#email").val()
     };
 
+    console.log(data);
+
     postAjax("/user/join", data, function(response) {
         alert("회원가입이 완료되었습니다.");
-        location.href = "/login";
+        window.location.href = "/login";
     }, function(error) {
         alert(JSON.stringify(error));
     });
