@@ -16,11 +16,11 @@
                 <div class="card-body">
                     <div class="chat-list"> <!-- 추후에 서버 에서 받아올 영역 -->
                         <ul>
-                            <li class="room-list"> <!-- 현재 더미 데이터 -->
-                                <p class="room-id">1</p>
-                                <h4 class="room-name">Room Name</h4>
-                                <p class="room-status">현재/전체</p>
-                                <a sec:authorize="isAuthenticated()" href="/chat" class="btn btn-primary">Enter</a>
+                            <li th:each="chatRoom : ${chatRooms}" class="room-list">
+                                <p class="room-id" th:text="${chatRoom.id}">1</p>
+                                <h4 class="room-name" th:text="${chatRoom.name}">Room Name</h4>
+                                <p class="room-status" th:text="'현재 ' + ${chatRoom.memberCount} + '명 채팅중'">현재 0명 채팅중</p>
+                                <a sec:authorize="isAuthenticated()" th:href="@{|/chatroom/${chatRoom.id}|}" class="btn btn-primary">Enter</a>
                             </li>
                         </ul>
                     </div>
