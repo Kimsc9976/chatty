@@ -16,6 +16,7 @@ public class ChatMessageController {
     @MessageMapping("/chat/{roomId}")
     @SendTo("/sub/chat/{roomId}")
     public String sendMessage(@DestinationVariable String roomId, String message) {
+        System.out.println("메시지 전송: " + message + " to room: " + roomId);
         redisMessagePublisher.publish(roomId, message);
         return message;
     }

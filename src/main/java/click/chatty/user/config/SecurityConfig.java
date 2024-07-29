@@ -24,7 +24,8 @@ public class SecurityConfig {
             "/",
             "/register",
             "/logins",
-            "/user/join"
+            "/user/join",
+            "/ws/**"
     };
 
     @Bean

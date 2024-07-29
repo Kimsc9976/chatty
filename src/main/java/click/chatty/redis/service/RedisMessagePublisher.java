@@ -12,6 +12,8 @@ public class RedisMessagePublisher {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public void publish(String roomId, String message) {
+        System.out.println("Publishing message to room " + roomId + ": " + message);
+
         redisTemplate.convertAndSend("chat." + roomId, message);
     }
 }

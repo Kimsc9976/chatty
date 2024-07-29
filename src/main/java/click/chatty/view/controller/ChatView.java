@@ -2,6 +2,8 @@ package click.chatty.view.controller;
 
 import click.chatty.chat.dto.ChatRoomDTO;
 import click.chatty.chat.service.ChatRoomService;
+import click.chatty.user.dto.UserDTO;
+import click.chatty.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import java.util.List;
 public class ChatView {
 
     private final ChatRoomService chatRoomService;
+    private final UserService userService;
 
     @GetMapping("/")
     public String index(Model model) {

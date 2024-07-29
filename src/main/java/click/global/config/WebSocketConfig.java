@@ -40,16 +40,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    // 클라이언트에서 접속할 웹 소켓 엔드포인트 설정 : /ws로 접속하면 웹 소켓 연결을 할 수 있음
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:8945")
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub/chat");
-        registry.setApplicationDestinationPrefixes("/pub/chat");
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 
 }

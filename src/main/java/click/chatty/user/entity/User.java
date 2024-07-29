@@ -52,6 +52,7 @@ public class User {
 
     public static User fromDTO(UserDTO userDTO) {
         return User.builder()
+                .id(userDTO.getId())
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
                 .email(userDTO.getEmail())
@@ -60,6 +61,7 @@ public class User {
 
     public UserDTO toDTO() {
         return UserDTO.builder()
+                .id(id)
                 .username(username)
                 .password(password)
                 .email(email)

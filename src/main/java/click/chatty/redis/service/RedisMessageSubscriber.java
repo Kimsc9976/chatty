@@ -1,15 +1,24 @@
 package click.chatty.redis.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RedisMessageSubscriber implements MessageListener {
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String channel = new String(pattern);
-        System.out.println("체널 에서 수신한 메세지" + channel + ": " + message.toString());
+        String roomId = channel.split("\\.")[1];
+        String receivedMessage = message.toString();
+        System.out.println("채널에서 수신한 메시지 " + channel + ": " + receivedMessage);
+
+        messagingTemplate.convertAndSend("/sub/chat/" + roomId, receivedMessage);
     }
 }

@@ -22,4 +22,12 @@ public class UserService {
         log.info("Join user: {}", user);
         userRepository.save(user);
     }
+
+    public UserDTO findByUsername(String userName) {
+        UserDTO userDTO = userRepository.findByUsername(userName)
+                .map(User::toDTO)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userName));
+        log.info("Find user: {}", userDTO);
+        return userDTO;
+    }
 }
