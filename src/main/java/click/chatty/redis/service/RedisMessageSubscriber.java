@@ -17,8 +17,6 @@ public class RedisMessageSubscriber implements MessageListener {
         String channel = new String(pattern);
         String roomId = channel.split("\\.")[1];
         String receivedMessage = message.toString();
-        System.out.println("채널에서 수신한 메시지 " + channel + ": " + receivedMessage);
-
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, receivedMessage);
     }
 }

@@ -2,7 +2,6 @@ package click.chatty.view.controller;
 
 import click.chatty.chat.dto.ChatRoomDTO;
 import click.chatty.chat.service.ChatRoomService;
-import click.chatty.user.dto.UserDTO;
 import click.chatty.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +17,14 @@ import java.util.List;
 public class ChatView {
 
     private final ChatRoomService chatRoomService;
-    private final UserService userService;
 
     @GetMapping("/")
     public String index(Model model) {
         log.info("MainView.index() 불려옴 =============================== {}", log.getName());
         log.debug("오류 발생 시 디버그 로그 확인용 =============================== {}", log.getName());
 
-        // 채팅방 목록을 조회하여 모델에 추가
         List<ChatRoomDTO> chatRooms = chatRoomService.findAll();
         model.addAttribute("chatRooms", chatRooms);
-
         return "index";
     }
 

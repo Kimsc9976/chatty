@@ -23,24 +23,17 @@ public class ChatMessageController {
     public String sendMessage(@DestinationVariable String roomId, @Payload String messagePayload) {
         String sender = extractSenderFromPayload(messagePayload);
         String message = extractMessageFromPayload(messagePayload);
-
-        System.out.println("====== 메시지 전송 ======");
-        System.out.println("메시지: " + message + ", 방 ID: " + roomId + ", 보낸 사람: " + sender);
-        System.out.println("================================");
-
         redisMessagePublisher.publish(roomId, message, sender);
-        return messagePayload; // 전체 payload를 반환
+        return messagePayload;
     }
 
     private String extractSenderFromPayload(String payload) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> map = objectMapper.readValue(payload, new TypeReference<Map<String, String>>() {});
+            Map<String, String> map = objectMapper.readValue(payload, new TypeReference<>() {
+            });
             return map.get("sender");
         } catch (Exception e) {
-            System.out.println("====== 메시지 발송 중 오류 발생 ======");
-            System.out.println("오류 메시지: " + e.getMessage());
-            System.out.println("================================");
             return "Unknown";
         }
     }
@@ -48,12 +41,10 @@ public class ChatMessageController {
     private String extractMessageFromPayload(String payload) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> map = objectMapper.readValue(payload, new TypeReference<Map<String, String>>() {});
+            Map<String, String> map = objectMapper.readValue(payload, new TypeReference<>() {
+            });
             return map.get("message");
         } catch (Exception e) {
-            System.out.println("====== 메시지 발송 중 오류 발생 ======");
-            System.out.println("오류 메시지: " + e.getMessage());
-            System.out.println("================================");
             return "";
         }
     }

@@ -26,7 +26,6 @@ public class ChatRoomController {
         Map<String, String> response = new HashMap<>();
         response.put("sender", "System");
         response.put("message", joinMessage);
-
         return ResponseEntity.ok(response);
     }
 

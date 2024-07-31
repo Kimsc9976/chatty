@@ -1,8 +1,6 @@
 export { getAjax, postAjax, putAjax, deleteAjax, getParameterByName };
 
 // Global util function
-
-
 function getAjax(url, success, error) {
     $.ajax({
         url: url,
@@ -42,7 +40,6 @@ function deleteAjax(url, success, error) {
         error: error
     });
 }
-
 
 function getParameterByName(name) {
     var url = window.location.href;

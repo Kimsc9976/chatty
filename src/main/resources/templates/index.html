@@ -14,7 +14,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <div class="chat-list"> <!-- 추후에 서버 에서 받아올 영역 -->
+                    <div class="chat-list">
                         <ul>
                             <li th:each="chatRoom : ${chatRooms}" class="room-list">
                                 <p class="room-id" th:text="${chatRoom.id}">1</p>

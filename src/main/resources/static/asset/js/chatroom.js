@@ -15,10 +15,9 @@ $(document).ready(function () {
 });
 
 function connect() {
-    const socket = new SockJS('/ws'); // SockJS를 사용하여 WebSocket 연결
+    const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        // 메시지를 구독하여 처리
         stompClient.subscribe('/sub/chat/' + chatRoomId, function (messageOutput) {
             let message;
             try {
@@ -43,7 +42,7 @@ function sendMessage() {
     } catch (e) {
         console.error("오류:", e);
     }
-    $('#message').val(''); // 메시지 전송 후 입력 필드 비우기
+    $('#message').val('');
 }
 
 function showMessageOutput(messageOutput) {
