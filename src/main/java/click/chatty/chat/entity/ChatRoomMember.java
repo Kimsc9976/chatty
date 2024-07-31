@@ -1,5 +1,6 @@
 package click.chatty.chat.entity;
 
+import click.chatty.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

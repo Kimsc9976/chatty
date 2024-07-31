@@ -35,11 +35,12 @@ public class ChatRoomMemberService {
         chatRoomMemberRepository.deleteByChatRoomIdAndUserId(chatRoomId, userId);
     }
 
-    public int count(Long chatRoomId) {
-        return chatRoomMemberRepository.countByChatRoomId(chatRoomId);
-    }
 
     public int getChatRoomMemberCount(Long id) {
         return chatRoomMemberRepository.countByChatRoomId(id);
+    }
+
+    public List<String> getChatRoomMemberNames(Long chatRoomId) {
+        return chatRoomMemberRepository.findUsernamesByChatRoomId(chatRoomId);
     }
 }

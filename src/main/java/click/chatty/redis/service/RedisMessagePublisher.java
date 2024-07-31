@@ -15,12 +15,14 @@ public class RedisMessagePublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public void publish(String roomId, String message, String sender) {
+    public void publish(String roomId, Object messageContent, String sender) {
         try {
-            Map<String, String> messageMap = new HashMap<>();
-            messageMap.put("message", message);
+            Map<String, Object> messageMap = new HashMap<>();
             messageMap.put("sender", sender);
+            messageMap.put("content", messageContent);
+
             String jsonMessage = objectMapper.writeValueAsString(messageMap);
+            System.out.println("Publishing to channel: chat." + roomId + " with message: " + jsonMessage);
             redisTemplate.convertAndSend("chat." + roomId, jsonMessage);
         } catch (Exception e) {
             System.out.println("오류 메시지: " + e.getMessage());

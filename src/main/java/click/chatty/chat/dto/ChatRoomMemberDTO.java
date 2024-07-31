@@ -10,5 +10,4 @@ public class ChatRoomMemberDTO {
     private Long id;
     private Long chatRoomId;
     private Long userId;
-
 }

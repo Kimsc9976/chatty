@@ -1,6 +1,7 @@
-export { getAjax, postAjax, putAjax, deleteAjax, getParameterByName };
+// Export functions
+export { getAjax, postAjax, putAjax, deleteAjax, getParameterByName, getAjaxPromise, postAjaxPromise, putAjaxPromise, deleteAjaxPromise };
 
-// Global util function
+// Global util function (Callback-based)
 function getAjax(url, success, error) {
     $.ajax({
         url: url,
@@ -38,6 +39,71 @@ function deleteAjax(url, success, error) {
         type: 'DELETE',
         success: success,
         error: error
+    });
+}
+
+// New Promise-based util functions
+function getAjaxPromise(url) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                resolve(response);
+            },
+            error: function(error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+function postAjaxPromise(url, data) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                resolve(response);
+            },
+            error: function(error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+function putAjaxPromise(url, data) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                resolve(response);
+            },
+            error: function(error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+function deleteAjaxPromise(url) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function(response) {
+                resolve(response);
+            },
+            error: function(error) {
+                reject(error);
+            }
+        });
     });
 }
 
