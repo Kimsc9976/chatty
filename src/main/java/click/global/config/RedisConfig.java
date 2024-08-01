@@ -31,17 +31,22 @@ public class RedisConfig {
 
     @Bean
     RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
-                                            MessageListenerAdapter listenerAdapter) {
+                                            MessageListenerAdapter chatMessageListenerAdapter,
+                                            MessageListenerAdapter memberListListenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("chat.*"));
+        container.addMessageListener(chatMessageListenerAdapter, new PatternTopic("chat.*"));
+        container.addMessageListener(memberListListenerAdapter, new PatternTopic("members.*"));
         return container;
     }
 
     @Bean
-    MessageListenerAdapter listenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber, "onMessage");
+    public MessageListenerAdapter chatMessageListenerAdapter(RedisMessageSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber);
     }
 
-
+    @Bean
+    public MessageListenerAdapter memberListListenerAdapter(RedisMessageSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber);
+    }
 }

@@ -1,7 +1,9 @@
 package click.chatty.chat.controller;
 
+import click.chatty.redis.controller.ChatMessageController;
 import click.chatty.chat.service.ChatRoomMemberService;
-import click.chatty.redis.service.RedisMessagePublisher;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,42 +18,62 @@ import java.util.Map;
 public class ChatRoomController {
 
     private final ChatRoomMemberService chatRoomMemberService;
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final ChatMessageController chatMessageController; // ChatMessageController 주입
 
     @PostMapping("/join")
-    public ResponseEntity<Map<String, String>> joinChatRoom(@RequestParam Long chatRoomId, @RequestParam String userName) {
+    public ResponseEntity<Map<String, String>> joinChatRoom(@RequestParam Long chatRoomId, @RequestParam String userName) throws JsonProcessingException {
         chatRoomMemberService.joinChatRoom(chatRoomId, userName);
-        String joinMessage = userName + " 님이 입장하셨습니다.";
+        String message = userName + " 님이 입장하셨습니다.";
 
-        publishMessageAndUpdateMembers(chatRoomId, joinMessage, "System");
+        // ChatMessageController를 통해 메시지 발행
+        chatMessageController.sendMessage(chatRoomId.toString(), new ObjectMapper().writeValueAsString(createResponse(message)));
 
-        Map<String, String> response = new HashMap<>();
-        response.put("sender", "System");
-        response.put("message", joinMessage);
-        return ResponseEntity.ok(response);
+        // 멤버 리스트 업데이트 후 발행
+        updateMembersList(chatRoomId);
+
+        return ResponseEntity.ok(createResponse(message));
     }
 
     @PostMapping("/leave")
-    public ResponseEntity<Map<String, String>> leaveChatRoom(@RequestParam Long chatRoomId, @RequestParam String userName) {
+    public ResponseEntity<Map<String, String>> leaveChatRoom(@RequestParam Long chatRoomId, @RequestParam String userName) throws JsonProcessingException {
         chatRoomMemberService.leaveChatRoom(chatRoomId, userName);
-        String leaveMessage = userName + " 님이 퇴장하셨습니다.";
+        String message = userName + " 님이 퇴장하셨습니다.";
 
-        publishMessageAndUpdateMembers(chatRoomId, leaveMessage, "System");
+        // ChatMessageController를 통해 메시지 발행
+        chatMessageController.sendMessage(chatRoomId.toString(), new ObjectMapper().writeValueAsString(createResponse(message)));
 
-        Map<String, String> response = new HashMap<>();
-        response.put("sender", "System");
-        response.put("message", leaveMessage);
+        // 멤버 리스트 업데이트 후 발행
+        updateMembersList(chatRoomId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(createResponse(message));
     }
 
-    // 중복된 로직을 처리하는 메서드
-    private void publishMessageAndUpdateMembers(Long chatRoomId, String message, String sender) {
-        redisMessagePublisher.publish(chatRoomId.toString(), message, sender);
+    private void updateMembersList(Long chatRoomId) {
+        try {
+            List<String> members = chatRoomMemberService.getChatRoomMemberNames(chatRoomId);
+            String roomId = chatRoomId.toString();
 
-        // 사용자 리스트를 업데이트
-        List<String> members = chatRoomMemberService.getChatRoomMemberNames(chatRoomId);
-        System.out.println("Publishing members list: " + members);
-        redisMessagePublisher.publish(chatRoomId + "/members", members, sender);
+            // 멤버 리스트를 JSON으로 변환
+            Map<String, Object> membersPayload = new HashMap<>();
+            membersPayload.put("members", members);
+
+            // JSON 문자열로 변환하여 발행
+            String jsonMembersPayload = new ObjectMapper().writeValueAsString(membersPayload);
+            System.out.println("멤버 리스트 업데이트 후 발행 chatRoomController : " + jsonMembersPayload);
+            // ChatMessageController를 통해 멤버 리스트 업데이트 발행
+            chatMessageController.updateMembersList(roomId, jsonMembersPayload);
+
+        } catch (Exception e) {
+            System.out.println("오류 메시지: " + e.getMessage());
+        }
+    }
+
+
+    private Map<String, String> createResponse(String message) {
+        Map<String, String> response = new HashMap<>();
+        response.put("sender", "System");
+        response.put("message", message);
+        response.put("type", "chat");
+        return response;
     }
 }
