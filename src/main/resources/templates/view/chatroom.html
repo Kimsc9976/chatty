@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:replace="~{include/header :: header}"></div>
+<link rel="stylesheet" href="/asset/css/chatroom.css">
+<body>
+
+<div class="container">
+    
+    <div class="row d-flex justify-content-center align-content-center">
+        
+        <div class="col-lg-8 col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <input type="hidden" id="userName" th:value="${#authentication.name}">
+                    <input type="hidden" id="chatRoomId" th:value="${chatRoom.id}">
+                    <h3 class="card-title" th:text="${chatRoom.name}">Room Name</h3>
+                    <a href="/" class="btn btn-danger" id="exit">Exit</a>
+                </div>
+                <div class="card-body">
+                    <div class="chat-box">
+                        <div class="chat-box-content" id="chat-box-content"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-box-input mt-3">
+                <div class="input-group">
+                    <input id="message" type="text" class="form-control" placeholder="Type a message">
+                    <button id="send" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-2 col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h3 class="card-title">현재 접속 리스트</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chat-box">
+                        <div class="chat-member-list" id="chat-member-list">
+                            <ul id="chat-members">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{include/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script type="module" src="/asset/js/util.js"></script>
+<script type="module" src="/asset/js/chatroom.js"></script>
+</body>

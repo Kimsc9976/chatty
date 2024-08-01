@@ -1,12 +1,35 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:replace="~{include/header :: header}"></div>
+<link rel="stylesheet" href="/asset/css/index.css">
 <body>
 
-<h1> Chatty ! </h1>
+<div class="container">
+    <div class="row d-flex justify-content-center align-content-center">
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        Rooms !
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="chat-list">
+                        <ul>
+                            <li th:each="chatRoom : ${chatRooms}" class="room-list">
+                                <p class="room-id" th:text="${chatRoom.id}">1</p>
+                                <h4 class="room-name" th:text="${chatRoom.name}">Room Name</h4>
+                                <p class="room-status" th:text="'현재 ' + ${chatRoom.memberCount} + '명 채팅중'">현재 0명 채팅중</p>
+                                <a sec:authorize="isAuthenticated()" th:href="@{|/chatroom/${chatRoom.id}|}" class="btn btn-primary">Enter</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
-</html>
+<div th:replace="~{include/footer :: footer}"></div>
+
