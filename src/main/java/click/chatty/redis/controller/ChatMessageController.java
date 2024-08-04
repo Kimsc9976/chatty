@@ -38,7 +38,7 @@ public class ChatMessageController {
             // 멤버 리스트를 JSON 문자열로 변환하여 Redis에 발행
             String updatedMembersPayload = new ObjectMapper().writeValueAsString(Map.of("members", members));
             redisMessagePublisher.publish(roomId, updatedMembersPayload, "System", "members");
-            System.out.println("멤버 리스트 업데이트 후 발행 chatMessageController : " + updatedMembersPayload);
+            System.out.println("멤버 리스트 발행 : " + updatedMembersPayload);
             return updatedMembersPayload;
 
         } catch (Exception e) {
@@ -71,6 +71,7 @@ public class ChatMessageController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> map = objectMapper.readValue(payload, new TypeReference<>() {});
+            System.out.println("==========멤버 리스트 추출=========== : " + map.get("members"));
             return (List<String>) map.get("members");
         } catch (Exception e) {
             return List.of();

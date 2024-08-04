@@ -25,7 +25,8 @@ public class RedisMessagePublisher {
 
             // 멤버 리스트 메시지 발행
             if ("members".equals(type)) {
-                jsonMessage = (String) messageContent;
+                messageMap.put("members", messageContent);
+                jsonMessage = objectMapper.writeValueAsString(messageMap);
                 System.out.println("멤버 리스트 토픽 : members." + roomId + " 토픽 메세지 : " + jsonMessage);
                 redisTemplate.convertAndSend("members." + roomId, jsonMessage);
             }
