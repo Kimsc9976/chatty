@@ -22,28 +22,24 @@ public class RedisMessagePublisher {
             messageMap.put("type", type);
 
             String jsonMessage;
-            switch (type) {
-                case "members":
-                    jsonMessage = (String) messageContent;
-                    System.out.println("멤버 리스트 토픽 : members." + roomId + " 토픽 메세지 : " + jsonMessage);
-                    break;
-                case "chat":
-                    // chat 타입인 경우 기존 로직대로 직렬화
-                    messageMap.put("message", messageContent);
-                    jsonMessage = objectMapper.writeValueAsString(messageMap);
-                    System.out.println("채팅 토픽 : chat." + roomId + " 토픽 메세지 : " + jsonMessage);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid message type: " + type);
+
+            // 멤버 리스트 메시지 발행
+            if ("members".equals(type)) {
+                jsonMessage = (String) messageContent;
+                System.out.println("멤버 리스트 토픽 : members." + roomId + " 토픽 메세지 : " + jsonMessage);
+                redisTemplate.convertAndSend("members." + roomId, jsonMessage);
             }
 
-            // 메시지 발행
-            redisTemplate.convertAndSend(type + "." + roomId, jsonMessage);
+            // 채팅 메시지 발행
+            if ("chat".equals(type)) {
+                messageMap.put("message", messageContent);
+                jsonMessage = objectMapper.writeValueAsString(messageMap);
+                System.out.println("채팅 토픽 : chat." + roomId + " 토픽 메세지 : " + jsonMessage);
+                redisTemplate.convertAndSend("chat." + roomId, jsonMessage);
+            }
 
         } catch (Exception e) {
             System.out.println("오류 메시지: " + e.getMessage());
         }
     }
-
-
 }

@@ -30,6 +30,7 @@ function connectWebSocket(chatRoomId, userName) {
         stompClient.send(`/pub/subscribed`, {}, JSON.stringify({ chatRoomId: chatRoomId, userName: userName }));
 
         handleJoinChatRoom(chatRoomId, userName);
+
     }, onWebSocketError);
 }
 
@@ -48,9 +49,9 @@ function subscribeToMembers(chatRoomId) {
     console.log("룸 아이디 확인:", chatRoomId);
     console.log("구독하는 멤버 리스트 토픽:", MEMBERS_TOPIC);
 
-    stompClient.subscribe(MEMBERS_TOPIC, function(messageOutput) {
-        console.log("멤버 리스트 메시지 수신:", messageOutput);
-        onMembersMessageReceived(messageOutput);
+    stompClient.subscribe(MEMBERS_TOPIC, function (message) {
+        console.log("멤버 리스트 메시지 수신:", message);
+        onMembersMessageReceived(message);
     });
 }
 
@@ -113,6 +114,8 @@ function handleLeaveChatRoom(chatRoomId, userName) {
         if (response) {
             console.log("채팅방 퇴장 성공, 서버에 퇴장 메시지 전송:", response);
             stompClient.send(`/pub/chat/${chatRoomId}`, {}, JSON.stringify(response));
+            subscribeToMembers(chatRoomId);
+            stompClient.disconnect();
             window.location.href = '/';
         }
     }, function(error) {
@@ -122,7 +125,7 @@ function handleLeaveChatRoom(chatRoomId, userName) {
 
 function updateChatMembersList(members) {
     const chatMembers = $('#chat-members');
-    chatMembers.empty();
+    chatMembers.empty(); // 기존 멤버 리스트 초기화
     members.forEach(member => {
         chatMembers.append($('<li>').text(member));
     });
