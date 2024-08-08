@@ -44,9 +44,4 @@ public class RedisConfig {
     public MessageListenerAdapter chatMessageListenerAdapter(RedisMessageSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber);
     }
-
-    @Bean
-    public MessageListenerAdapter memberListListenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber);
-    }
 }

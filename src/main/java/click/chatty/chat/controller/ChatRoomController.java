@@ -18,7 +18,7 @@ import java.util.Map;
 public class ChatRoomController {
 
     private final ChatRoomMemberService chatRoomMemberService;
-    private final ChatMessageController chatMessageController; // ChatMessageController 주입
+    private final ChatMessageController chatMessageController;
 
     @PostMapping("/join")
     public ResponseEntity<Map<String, String>> joinChatRoom(@RequestParam Long chatRoomId, @RequestParam String userName) throws JsonProcessingException {
@@ -53,27 +53,14 @@ public class ChatRoomController {
             List<String> members = chatRoomMemberService.getChatRoomMemberNames(chatRoomId);
             String roomId = chatRoomId.toString();
 
-            // 멤버 리스트를 "System" sender와 멤버 리스트 메시지를 포함한 형식으로 변환
-            Map<String, Object> membersResponse = createMembersResponse(members);
-
-            // JSON 문자열로 변환하여 발행
-            String jsonMembersPayload = new ObjectMapper().writeValueAsString(membersResponse);
-            System.out.println("멤버 리스트 업데이트 후 발행 chatRoomController : " + jsonMembersPayload);
-            // ChatMessageController를 통해 멤버 리스트 업데이트 발행
-            chatMessageController.updateMembersList(roomId, jsonMembersPayload);
+            chatMessageController.updateMembersList(roomId, members);
 
         } catch (Exception e) {
             System.out.println("오류 메시지: " + e.getMessage());
         }
     }
 
-    private Map<String, Object> createMembersResponse(List<String> members) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("sender", "System");
-        response.put("members", members);
-        response.put("type", "members");
-        return response;
-    }
+
 
     private Map<String, String> createResponse(String message) {
         Map<String, String> response = new HashMap<>();

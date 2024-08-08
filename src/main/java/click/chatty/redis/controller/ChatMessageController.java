@@ -31,21 +31,18 @@ public class ChatMessageController {
 
     @MessageMapping("/members/{roomId}")
     @SendTo("/sub/members/{roomId}")
-    public String updateMembersList(@DestinationVariable String roomId, @Payload String membersPayload) {
+    public List<String> updateMembersList(@DestinationVariable String roomId, @Payload List<String> members) {
         try {
-            // JSON 파싱하여 멤버 리스트 추출
-            List<String> members = extractMembersFromPayload(membersPayload);
-            // 멤버 리스트를 JSON 문자열로 변환하여 Redis에 발행
-            String updatedMembersPayload = new ObjectMapper().writeValueAsString(Map.of("members", members));
-            redisMessagePublisher.publish(roomId, updatedMembersPayload, "System", "members");
-            System.out.println("멤버 리스트 발행 : " + updatedMembersPayload);
-            return updatedMembersPayload;
+            redisMessagePublisher.publish(roomId, members, "System", "members");
+            return members;
 
         } catch (Exception e) {
             System.out.println("오류 메시지: " + e.getMessage());
             return null;
         }
     }
+
+
 
     private String extractSenderFromPayload(String payload) {
         try {
@@ -64,17 +61,6 @@ public class ChatMessageController {
             return map.get("message");
         } catch (Exception e) {
             return "";
-        }
-    }
-
-    private List<String> extractMembersFromPayload(String payload) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> map = objectMapper.readValue(payload, new TypeReference<>() {});
-            System.out.println("==========멤버 리스트 추출=========== : " + map.get("members"));
-            return (List<String>) map.get("members");
-        } catch (Exception e) {
-            return List.of();
         }
     }
 }

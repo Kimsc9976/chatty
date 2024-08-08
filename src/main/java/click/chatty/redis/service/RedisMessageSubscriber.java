@@ -21,15 +21,15 @@ public class RedisMessageSubscriber implements MessageListener {
         String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
 
         if (channel.startsWith("members.")) {
-            System.out.println("서버에서 클라이언트로 보내는 마지막 구간 메세지 : " + receivedMessage);
+            System.out.println("서버에서 클라이언트로 보내는 마지막 구간 멤버 메세지 : " + receivedMessage);
             messagingTemplate.convertAndSend("/sub/members/" + roomId, receivedMessage);
         } else if (channel.startsWith("chat.")) {
+            System.out.println("서버에서 클라이언트로 보내는 마지막 구간 채팅 메세지 : " + receivedMessage);
             messagingTemplate.convertAndSend("/sub/chat/" + roomId, receivedMessage);
         } else {
             System.out.println("알 수 없는 채널에서 메시지 수신: " + channel);
         }
     }
-
 
     private String extractRoomIdFromChannel(String channel) {
         String[] parts = channel.split("\\.");
