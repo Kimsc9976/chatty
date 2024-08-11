@@ -13,7 +13,6 @@ import java.util.Map;
 public class RedisMessagePublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
 
     public void publish(String roomId, Object messageContent, String sender, String type) {
         try {
@@ -22,8 +21,7 @@ public class RedisMessagePublisher {
             messageMap.put("type", type);
             messageMap.put("message", messageContent);
 
-            String jsonMessage = objectMapper.writeValueAsString(messageMap);
-            redisTemplate.convertAndSend(type + "." + roomId, jsonMessage);
+            redisTemplate.convertAndSend(type + "." + roomId, messageMap);
 
         } catch (Exception e) {
             System.out.println("오류 메시지: " + e.getMessage());

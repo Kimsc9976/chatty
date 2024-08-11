@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <div th:replace="~{include/header :: header}"></div>
 <link rel="stylesheet" href="/asset/css/chatroom.css">
 <body>
@@ -39,7 +39,7 @@
                 <div class="card-body">
                     <div class="chat-box">
                         <div class="chat-member-list" id="chat-member-list">
-                            <ul id="chat-member"></ul>
+                            <div id="chat-member"></div>
                         </div>
                     </div>
                 </div>

@@ -4,10 +4,7 @@ import click.chatty.redis.service.RedisMessagePublisher;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -22,10 +19,12 @@ public class ChatMessageController {
     @MessageMapping("/chat/{roomId}")
     @SendTo("/sub/chat/{roomId}")
     public String sendMessage(@DestinationVariable String roomId, @Payload String messagePayload) {
+        System.out.println("sendMessage 호출됨, roomId: " + roomId + ", messagePayload: " + messagePayload);
+
         String sender = extractSenderFromPayload(messagePayload);
         String message = extractMessageFromPayload(messagePayload);
         redisMessagePublisher.publish(roomId, message, sender, "chat");
-        System.out.println("메시지 발행: " + messagePayload);
+        System.out.println("메시지 발행 cmc: " + messagePayload);
         return messagePayload;
     }
 
@@ -33,7 +32,12 @@ public class ChatMessageController {
     @SendTo("/sub/members/{roomId}")
     public List<String> updateMembersList(@DestinationVariable String roomId, @Payload List<String> members) {
         try {
-            redisMessagePublisher.publish(roomId, members, "System", "members");
+            System.out.println("updateMembersList 호출됨, roomId: " + roomId + ", members: " + members);
+
+            String sender = "System";
+            String message = members.toString();
+            redisMessagePublisher.publish(roomId, message, sender, "members");
+            System.out.println("멤버 리스트 cmc : " + members);
             return members;
 
         } catch (Exception e) {
@@ -42,14 +46,13 @@ public class ChatMessageController {
         }
     }
 
-
-
     private String extractSenderFromPayload(String payload) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> map = objectMapper.readValue(payload, new TypeReference<>() {});
             return map.get("sender");
         } catch (Exception e) {
+            System.out.println("extractSenderFromPayload 오류: " + e.getMessage());
             return "Unknown";
         }
     }
@@ -60,6 +63,7 @@ public class ChatMessageController {
             Map<String, String> map = objectMapper.readValue(payload, new TypeReference<>() {});
             return map.get("message");
         } catch (Exception e) {
+            System.out.println("extractMessageFromPayload 오류: " + e.getMessage());
             return "";
         }
     }

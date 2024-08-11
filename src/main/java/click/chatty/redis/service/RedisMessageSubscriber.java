@@ -7,12 +7,15 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 @RequiredArgsConstructor
 public class RedisMessageSubscriber implements MessageListener {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -20,14 +23,20 @@ public class RedisMessageSubscriber implements MessageListener {
         String roomId = extractRoomIdFromChannel(channel);
         String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
 
-        if (channel.startsWith("members.")) {
-            System.out.println("서버에서 클라이언트로 보내는 마지막 구간 멤버 메세지 : " + receivedMessage);
-            messagingTemplate.convertAndSend("/sub/members/" + roomId, receivedMessage);
-        } else if (channel.startsWith("chat.")) {
-            System.out.println("서버에서 클라이언트로 보내는 마지막 구간 채팅 메세지 : " + receivedMessage);
-            messagingTemplate.convertAndSend("/sub/chat/" + roomId, receivedMessage);
-        } else {
-            System.out.println("알 수 없는 채널에서 메시지 수신: " + channel);
+        try {
+            JsonNode jsonNode = objectMapper.readTree(receivedMessage);
+
+            if (channel.startsWith("members.")) {
+                messagingTemplate.convertAndSend("/sub/members/" + roomId, jsonNode);
+                System.out.println("멤버 리스트 rms: " + jsonNode);
+            } else if (channel.startsWith("chat.")) {
+                messagingTemplate.convertAndSend("/sub/chat/" + roomId, jsonNode);
+                System.out.println("채팅 메세지 rms: " + jsonNode);
+            } else {
+                System.out.println("알 수 없는 채널에서 메시지 수신: " + channel);
+            }
+        } catch (Exception e) {
+            System.out.println("메시지 파싱 오류: " + e.getMessage());
         }
     }
 

@@ -1,7 +1,7 @@
-import { getAjax, postAjax } from "./util.js";
+import { postAjax } from "./util.js";
 
-let stompClientChat = null;
-let stompClientMembers = null;
+let stompClientChat;
+let stompClientMember;
 
 $(document).ready(async function () {
     const chatRoomId = $('#chatRoomId').val();
@@ -9,6 +9,8 @@ $(document).ready(async function () {
 
     try {
         await ensureSingleConnection(chatRoomId, userName);
+        await handleJoinChatRoom(chatRoomId, userName);
+
         $('#send').on('click', function() {
             handleSendMessage(chatRoomId, userName);
         });
@@ -22,54 +24,33 @@ $(document).ready(async function () {
 });
 
 async function ensureSingleConnection(chatRoomId, userName) {
-    if (!stompClientChat) {
-        await connectChatWebSocket(chatRoomId, userName);
+    if (!stompClientChat || !stompClientMember) {
+        await connectWebSockets(chatRoomId, userName);
     } else {
-        console.log("이미 채팅 WebSocket이 연결되어 있습니다.");
-    }
-
-    if (!stompClientMembers) {
-        await connectMembersWebSocket(chatRoomId);
-    } else {
-        console.log("이미 멤버 리스트 WebSocket이 연결되어 있습니다.");
+        console.log("이미 WebSocket이 연결되어 있습니다.");
     }
 }
 
-async function connectChatWebSocket(chatRoomId, userName) {
+async function connectWebSockets(chatRoomId, userName) {
     return new Promise((resolve, reject) => {
         const chatSocket = new SockJS('/ws/chat');
         stompClientChat = Stomp.over(chatSocket);
         stompClientChat.connect({}, function(frame) {
-            console.log("/ws/chat WebSocket 연결 성공, 채팅방 ID:", chatRoomId);
-            if (stompClientChat) {
-                subscribeToChat(chatRoomId);
-                handleJoinChatRoom(chatRoomId, userName);
-                resolve();
-            } else {
-                reject("stompClientChat 초기화 오류");
-            }
+            console.log("Connected to chat: " + frame);
+            subscribeToChat(chatRoomId);
+            resolve(); // 채팅 WebSocket 연결 후 resolve 호출
         }, function(error) {
             onWebSocketError(error);
             reject(error);
         });
-    });
-}
 
-async function connectMembersWebSocket(chatRoomId) {
-    return new Promise((resolve, reject) => {
-        const membersSocket = new SockJS('/ws/members');
-        stompClientMembers = Stomp.over(membersSocket);
-        stompClientMembers.connect({}, function(frame) {
-            console.log("/ws/members WebSocket 연결 성공, 채팅방 ID:", chatRoomId);
-            if (stompClientMembers) {
-                subscribeToMembers(chatRoomId);
-                resolve();
-            } else {
-                reject("stompClientMembers 초기화 오류");
-            }
+        const memberSocket = new SockJS('/ws/members');
+        stompClientMember = Stomp.over(memberSocket);
+        stompClientMember.connect({}, function(frame) {
+            console.log("Connected to members: " + frame);
+            // subscribeToMember는 handleJoinChatRoom 이후에 호출됨
         }, function(error) {
             onWebSocketError(error);
-            reject(error);
         });
     });
 }
@@ -86,26 +67,32 @@ function subscribeToChat(chatRoomId) {
     stompClientChat.subscribe(CHAT_TOPIC, function(messageOutput) {
         console.log("채팅 메시지 수신:", messageOutput);
         onChatMessageReceived(messageOutput);
+    }, function(error) {
+        console.error("채팅 메시지 구독 중 오류 발생:", error);
     });
 }
 
-function subscribeToMembers(chatRoomId) {
-    if (!stompClientMembers) {
-        console.error("stompClientMembers가 null입니다. 구독을 설정할 수 없습니다.");
-        return;
-    }
+async function subscribeToMember(chatRoomId) {
+    return new Promise((resolve, reject) => {
+        console.log("subscribeToMember 호출됨");
 
-    const MEMBERS_TOPIC = `/sub/members/${chatRoomId}`;
-    console.log("구독하는 멤버 리스트 토픽:", MEMBERS_TOPIC);
+        if (!stompClientMember) {
+            console.error("stompClientMember가 null입니다. 구독을 설정할 수 없습니다.");
+            reject(new Error("stompClientMember가 null입니다."));
+        }
 
-    stompClientMembers.subscribe(MEMBERS_TOPIC, function(message) {
-        console.log("멤버 리스트 메시지 수신:", message);
-        onMembersMessageReceived(message);
+        const MEMBER_TOPIC = `/sub/members/${chatRoomId}`;
+        console.log("구독하는 멤버 토픽:", MEMBER_TOPIC);
+
+        stompClientMember.subscribe(MEMBER_TOPIC, function(messageOutput) {
+            console.log("멤버 메시지 수신:", messageOutput);
+            onMemberMessageReceived(messageOutput);
+            resolve();
+        }, function(error) {
+            console.error("멤버 메시지 구독 중 오류 발생:", error);
+            reject(error);
+        });
     });
-}
-
-function onWebSocketError(error) {
-    console.error("WebSocket 연결 오류:", error);
 }
 
 function onChatMessageReceived(messageOutput) {
@@ -120,24 +107,46 @@ function onChatMessageReceived(messageOutput) {
     }
 }
 
-function onMembersMessageReceived(messageOutput) {
-    console.log("멤버 리스트 메시지 수신:", messageOutput);  // 추가 로그로 메시지 수신 확인
+function onMemberMessageReceived(messageOutput) {
     try {
         const message = JSON.parse(messageOutput.body);
-        console.log("members 메시지 파싱:", message);
-        if (message.type === 'members' && Array.isArray(message.message)) {
-            updateChatMembersList(message.message);
-        } else {
-            console.error("잘못된 멤버 리스트 형식:", message);
+        console.log("member 메시지 파싱:", message);
+        if (message.type === 'members') {
+            displayMemberList(message.message);  // 수정: message.message로 리스트를 넘겨줌
         }
     } catch (e) {
-        console.error("멤버 리스트 메시지 파싱 오류:", e, messageOutput);
+        console.error("멤버 메시지 파싱 오류:", e, messageOutput);
+    }
+}
+
+function displayChatMessage(message) {
+    const chatBoxContent = $('#chat-box-content');
+    const messageElement = $('<div class="chat-box-message">')
+        .append($('<div class="chat-box-message-content">')
+            .append($('<div class="chat-box-message-text">').append($('<p>').text((message.sender || "Unknown") + ": " + (message.message || "")))))
+        .append($('<div class="chat-box-message-time">').append($('<p>').text(new Date().toLocaleTimeString())));
+    chatBoxContent.append(messageElement);
+    chatBoxContent.scrollTop(chatBoxContent.prop("scrollHeight"));
+    console.log("채팅 메시지 출력:", message.sender + ": " + message.message);
+}
+
+function displayMemberList(members) {
+    console.log("======멤버 리스트 출력=======:", members);
+    const memberList = $('#chat-member');
+    memberList.empty();
+    if (Array.isArray(members)) {
+        members.forEach(member => {
+            const memberElement = $('<div class="chat-member">').append($('<p>').text(member));
+            memberList.append(memberElement);
+        });
+    } else {
+        console.error("멤버 리스트 형식 오류:", members);
     }
 }
 
 function handleSendMessage(chatRoomId, userName) {
     const message = $('#message').val();
-    if (message.trim() === '') return;  // 빈 메시지 방지
+    if (message.trim() === '') return;
     try {
         stompClientChat.send(`/pub/chat/${chatRoomId}`, {}, JSON.stringify({
             'message': message,
@@ -150,51 +159,61 @@ function handleSendMessage(chatRoomId, userName) {
     $('#message').val('');
 }
 
-function handleJoinChatRoom(chatRoomId, userName) {
-    postAjax(`/chatroom/join?chatRoomId=${chatRoomId}&userName=${userName}`, null, function(response) {
-        if (response) {
-            console.log("채팅방 참가 성공, 서버에 입장 메시지 전송:", response);
-            stompClientChat.send(`/pub/chat/${chatRoomId}`, {}, JSON.stringify(response));
-        }
-    }, function(error) {
-        console.error("채팅방 참가 오류:", error);
+function handleChatRoomAction(actionType, chatRoomId, userName) {
+    return new Promise((resolve, reject) => {
+        const url = `/chatroom/${actionType}?chatRoomId=${chatRoomId}&userName=${userName}`;
+
+        postAjax(url, null, function(response) {
+            if (response) {
+                console.log(`채팅방 ${actionType === 'join' ? '참가' : '퇴장'} 성공, 서버에 메시지 전송:`, response);
+
+                // chatMessage와 memberMessage를 따로 분리하여 생성
+                const chatMessage = {
+                    'sender': 'System',
+                    'message': `${userName} 님이 ${actionType === 'join' ? '입장' : '퇴장'}하셨습니다.`,
+                    'type': 'chat'
+                };
+
+                const memberMessage = {
+                    'sender': 'System',
+                    'message': response.members ? response.members.toString() : userName,
+                    'type': 'members'
+                };
+
+                // 각 WebSocket으로 메시지 전송
+                stompClientChat.send(`/pub/chat/${chatRoomId}`, {}, JSON.stringify(chatMessage));
+                stompClientMember.send(`/pub/member/${chatRoomId}`, {}, JSON.stringify(memberMessage));
+
+                if (actionType === 'leave') {
+                    stompClientChat.disconnect();
+                    stompClientMember.disconnect();
+                    window.location.href = '/';
+                }
+                resolve(); // 작업 완료 알림
+            }
+        }, function(error) {
+            console.error(`채팅방 ${actionType === 'join' ? '참가' : '퇴장'} 오류:`, error);
+            reject(error); // 오류 발생 알림
+        });
     });
+}
+
+async function handleJoinChatRoom(chatRoomId, userName) {
+    console.log("handleJoinChatRoom 호출됨");
+
+    await subscribeToMember(chatRoomId);  // 멤버 구독을 먼저 설정
+
+    // 채팅방에 참가 후 서버에 메시지를 전송
+    await handleChatRoomAction('join', chatRoomId, userName);
+    console.log("handleJoinChatRoom 완료됨");
 }
 
 function handleLeaveChatRoom(chatRoomId, userName) {
-    postAjax(`/chatroom/leave?chatRoomId=${chatRoomId}&userName=${userName}`, null, function(response) {
-        if (response) {
-            console.log("채팅방 퇴장 성공, 서버에 퇴장 메시지 전송:", response);
-            stompClientChat.send(`/pub/chat/${chatRoomId}`, {}, JSON.stringify(response));
-            stompClientChat.disconnect(); // 채팅 WebSocket 연결 해제
-            stompClientMembers.disconnect(); // 멤버 리스트 WebSocket 연결 해제
-            window.location.href = '/';
-        }
-    }, function(error) {
-        console.error("채팅방 퇴장 오류:", error);
+    handleChatRoomAction('leave', chatRoomId, userName).then(r => {
+        console.log("handleLeaveChatRoom 호출됨");
     });
 }
 
-function updateChatMembersList(members) {
-    const chatMembers = $('#chat-member');
-    chatMembers.empty(); // 기존 멤버 리스트 초기화
-    if (members && members.length > 0) {
-        members.forEach(member => {
-            chatMembers.append($('<li>').text(member));
-        });
-    } else {
-        console.log("멤버 리스트가 비어 있습니다.");
-    }
-    console.log("멤버 리스트 업데이트:", members);
-}
-
-function displayChatMessage(message) {
-    const chatBoxContent = $('#chat-box-content');
-    const messageElement = $('<div class="chat-box-message">')
-        .append($('<div class="chat-box-message-content">')
-            .append($('<div class="chat-box-message-text">').append($('<p>').text((message.sender || "Unknown") + ": " + (message.message || "")))))
-        .append($('<div class="chat-box-message-time">').append($('<p>').text(new Date().toLocaleTimeString())));
-    chatBoxContent.append(messageElement);
-    chatBoxContent.scrollTop(chatBoxContent.prop("scrollHeight"));
-    console.log("채팅 메시지 출력:", message.sender + ": " + message.message);
+function onWebSocketError(error) {
+    console.error("WebSocket 연결 오류:", error);
 }
