@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -21,11 +21,22 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
+        template.setConnectionFactory(connectionFactory);
+
+        // Key Serializer
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+
+        // Value Serializer
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+
+        template.setDefaultSerializer(jackson2JsonRedisSerializer);
+
+        template.afterPropertiesSet();
         return template;
     }
 
@@ -42,11 +53,11 @@ public class RedisConfig {
 
     @Bean
     public MessageListenerAdapter chatMessageListenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber);
+        return new MessageListenerAdapter(subscriber, "onMessage");
     }
 
     @Bean
     public MessageListenerAdapter memberListListenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber);
+        return new MessageListenerAdapter(subscriber, "onMessage");
     }
 }

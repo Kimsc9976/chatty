@@ -41,10 +41,6 @@ public class ChatRoomMemberService {
     }
 
     public List<String> getChatRoomMemberNames(Long chatRoomId) {
-        System.out.println("================================");
-        System.out.println("방 채널: " + chatRoomId);
-        System.out.println("참여 인원 이름 : " + chatRoomMemberRepository.findUsernamesByChatRoomId(chatRoomId));
-        System.out.println("===================================");
         return chatRoomMemberRepository.findUsernamesByChatRoomId(chatRoomId);
     }
 }
