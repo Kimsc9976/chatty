@@ -62,7 +62,7 @@ function subscribeToChat(chatRoomId) {
     });
 }
 
-function subscribeToMember(chatRoomId) {
+async function subscribeToMember(chatRoomId) {
     const MEMBER_TOPIC = `/sub/members/${chatRoomId}`;
     console.log("구독하는 멤버 토픽:", MEMBER_TOPIC);
 
@@ -139,7 +139,7 @@ function handleSendMessage(chatRoomId, userName) {
     $('#message').val('');
 }
 
-function handleChatRoomAction(actionType, chatRoomId, userName) {
+async function handleChatRoomAction(actionType, chatRoomId, userName) {
     const url = `/chatroom/${actionType}?chatRoomId=${chatRoomId}&userName=${userName}`;
 
     postAjax(url, null, function(response) {
@@ -175,10 +175,10 @@ function handleChatRoomAction(actionType, chatRoomId, userName) {
     });
 }
 
-function handleJoinChatRoom(chatRoomId, userName) {
+async function handleJoinChatRoom(chatRoomId, userName) {
     console.log("handleJoinChatRoom 호출됨");
-    handleChatRoomAction('join', chatRoomId, userName);
-    subscribeToMember(chatRoomId);
+    await handleChatRoomAction('join', chatRoomId, userName);
+    await subscribeToMember(chatRoomId);
     console.log("handleJoinChatRoom 완료됨");
 }
 
